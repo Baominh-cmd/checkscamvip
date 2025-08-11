@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>CheckScam VIP — Kiểm tra link FB</title>
+<style>
+  :root{
+    --bg1:#0f172a; --bg2:#0b1220; --card:#0b1228;
+    --accent:#ff6b6b; --accent2:#ffd166; --muted:#9aa7c1;
+    --glass: rgba(255,255,255,0.03);
+    --success:#2ecc71; --danger:#ff4d4f; --vip:#7b61ff;
+    font-family: Inter, ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; background:linear-gradient(135deg,var(--bg1),var(--bg2));
+    color:#e6eef8; display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .wrap{width:1100px; max-width:100%; display:grid; grid-template-columns:420px 1fr; gap:20px}
+  .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+        border-radius:12px; padding:18px; box-shadow:0 6px 30px rgba(2,6,23,0.7); border:1px solid rgba(255,255,255,0.03)}
+  header h1{margin:0 0 6px 0; font-size:20px}
+  .brand{display:flex; gap:12px; align-items:center}
+  .logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:700;color:#071025}
+  input,select,textarea{width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.04);
+    background:transparent; color:inherit; outline:none; margin-top:8px}
+  .btn{display:inline-block;padding:10px 14px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#071025;font-weight:600;border:none;cursor:pointer;margin-top:8px}
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06); color:var(--muted)}
+  .muted{color:var(--muted); font-size:13px}
+  .row{display:flex;gap:8px}
+  .card-list{display:flex;flex-direction:column;gap:10px; margin-top:12px}
+  .item{padding:10px;border-radius:10px;background:var(--card); border:1px solid rgba(255,255,255,0.02); display:flex;justify-content:space-between;align-items:center}
+  .badge{padding:6px 8px;border-radius:8px;font-weight:600}
+  .danger{background:linear-gradient(90deg,var(--danger),#ff7b7b); color:#071025}
+  .ok{background:linear-gradient(90deg,var(--success),#6be090); color:#071025}
+  .vip{background:linear-gradient(90deg,var(--vip),#9b7bff); color:#071025}
+  .hidden{display:none}
+  nav{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  nav button{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:8px 10px;border-radius:8px;color:var(--muted);cursor:pointer}
+  table{width:100%; border-collapse:collapse; margin-top:10px}
+  table th, table td{padding:8px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.03); font-size:13px}
+  .foot{margin-top:10px;color:var(--muted);font-size:13px}
+  .flex-stretch{display:flex;gap:8px;align-items:center}
+  .right {margin-left:auto}
+  .danger-tx{color:var(--danger); font-weight:700}
+  .ok-tx{color:var(--success); font-weight:700}
+  .topbar{display:flex;align-items:center;gap:12px}
+  .searchbox{display:flex;gap:8px;align-items:center}
+  .hint{font-size:12px;color:var(--muted)}
+  .vip-area{margin-top:12px;padding:10px;border-radius:8px;border:1px dashed rgba(255,255,255,0.03)}
+  @media (max-width:900px){ .wrap{grid-template-columns:1fr; padding:8px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- left: Quick check & auth -->
+  <div class="panel">
+    <div class="brand">
+      <div class="logo">CS</div>
+      <div>
+        <h1>CheckScam VIP</h1>
+        <p>Kiểm tra link Facebook — VIP features</p>
+      </div>
+    </div>
+
+    <!-- login / register -->
+    <div id="auth-area" class="form">
+      <div id="not-logged">
+        <div><strong>Đăng nhập</strong></div>
+        <input id="login-username" placeholder="Tên đăng nhập hoặc email" />
+        <input id="login-password" type="password" placeholder="Mật khẩu" />
+        <div class="row">
+          <button class="btn" id="btn-login">Đăng nhập</button>
+          <button class="btn ghost" id="show-register">Đăng ký</button>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <button class="btn ghost" id="btn-forgot">Quên mật khẩu</button>
+        </div>
+      </div>
+
+      <div id="register" class="hidden">
+        <div><strong>Đăng ký tài khoản mới</strong></div>
+        <input id="reg-username" placeholder="Tên đăng nhập (unique)" />
+        <input id="reg-email" placeholder="Email" />
+        <input id="reg-password" type="password" placeholder="Mật khẩu" />
+        <div class="row">
+          <button class="btn" id="btn-register">Tạo tài khoản</button>
+          <button class="btn ghost" id="cancel-register">Hủy</button>
+        </div>
+        <p class="hint">Tài khoản mới lưu localStorage (demo). Để production cần backend.</p>
+      </div>
+
+      <div id="forgot" class="hidden">
+        <div><strong>Quên mật khẩu</strong></div>
+        <input id="fp-email" placeholder="Nhập email đã đăng ký" />
+        <div class="row">
+          <button class="btn" id="btn-send-code">Gửi mã (mô phỏng)</button>
+          <button class="btn ghost" id="cancel-forgot">Hủy</button>
+        </div>
+        <p class="hint">Demo: mã sẽ hiển thị trong trang (vì không có mail server).</p>
+        <div id="fp-code-area" class="hidden" style="margin-top:8px">
+          <input id="fp-code" placeholder="Nhập mã bạn nhận được" />
+          <input id="fp-newpass" type="password" placeholder="Mật khẩu mới" />
+          <div class="row">
+            <button class="btn" id="btn-reset-pass">Đổi mật khẩu</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="user-area" class="hidden" style="margin-top:12px">
+      <div class="topbar">
+        <div><strong id="whoami">Xin chào, user</strong> <span id="badge-vip" class="badge vip hidden" style="margin-left:8px">VIP</span></div>
+        <div class="right">
+          <button class="btn ghost" id="btn-logout">Đăng xuất</button>
+        </div>
+      </div>
+
+      <div style="margin-top:10px" class="note">
+        <div class="searchbox">
+          <input id="fb-link" placeholder="Dán link Facebook ở đây (ví dụ: https://facebook.com/username)" />
+          <button class="btn" id="btn-check">Check</button>
+        </div>
+        <p class="hint">Chỉ người đăng nhập mới được check. VIP sẽ thấy thêm chi tiết trong kết quả.</p>
+      </div>
+
+      <div id="check-result" class="card-list"></div>
+
+      <div id="vip-section" class="vip-area hidden">
+        <strong>VIP Zone</strong>
+        <p class="muted">Người dùng VIP có thể xem thêm thông tin chi tiết (demo): ghi chú admin, lịch sử giao dịch đầy đủ.</p>
+        <div id="vip-details" class="muted"></div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <strong>Lịch sử kiểm tra</strong>
+        <div id="history-area" class="card-list"></div>
+      </div>
+    </div>
+
+    <div class="foot">
+      <div><strong>Admin mặc định</strong>: baominhdev / 123457321</div>
+      <div class="muted">Lưu ý: demo lưu localStorage. Muốn gửi email thật mình sẽ hướng dẫn EmailJS/SMTP.</div>
+    </div>
+  </div>
+
+  <!-- right: admin dashboard -->
+  <div class="panel" id="admin-panel">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <h2>Admin Dashboard</h2>
+        <p class="muted">Chỉ admin mới thấy panel này và có quyền chỉnh sửa</p>
+      </div>
+      <div class="muted">Bạn là: <span id="admin-name">-</span></div>
+    </div>
+
+    <nav>
+      <button data-tab="scammers">Danh sách Scam</button>
+      <button data-tab="agents">Giao dịch viên uy tín</button>
+      <button data-tab="users">Người dùng</button>
+      <button data-tab="logs">Lịch sử kiểm tra</button>
+    </nav>
+
+    <section id="tab-scammers" class="tab">
+      <div class="form">
+        <strong>Thêm người scam / chiếm đoạt</strong>
+        <input id="s-name" placeholder="Tên (người hoặc shop)" />
+        <input id="s-fblink" placeholder="Link FB (full link)" />
+        <input id="s-bank" placeholder="Số tài khoản / thông tin chiếm đoạt" />
+        <div class="row">
+          <button class="btn" id="btn-add-scam">Thêm</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <strong>Danh sách hiện có</strong>
+        <div id="scammer-list" class="card-list"></div>
+      </div>
+    </section>
+
+    <section id="tab-agents" class="tab hidden">
+      <div class="form">
+        <strong>Thêm giao dịch viên uy tín</strong>
+        <input id="a-name" placeholder="Tên" />
+        <input id="a-ins" placeholder="Số bảo hiểm / Mã" />
+        <input id="a-phone" placeholder="Số điện thoại" />
+        <input id="a-bank" placeholder="Số tài khoản" />
+        <input id="a-fb" placeholder="Link FB (option)" />
+        <div class="row">
+          <button class="btn" id="btn-add-agent">Thêm</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <strong>Danh sách agents</strong>
+        <div id="agent-list" class="card-list"></div>
+      </div>
+    </section>
+
+    <section id="tab-users" class="tab hidden">
+      <div>
+        <strong>Người dùng đã đăng ký</strong>
+        <table id="users-table">
+          <thead><tr><th>Tên</th><th>Email</th><th>VIP</th><th>Hành động</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tab-logs" class="tab hidden">
+      <div>
+        <strong>Lịch sử kiểm tra</strong>
+        <table id="logs-table">
+          <thead><tr><th>Thời gian</th><th>Người kiểm tra</th><th>Link</th><th>Kết quả</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+/*
+  CheckScam VIP demo (single-file).
+  - Data stored in localStorage under key 'cs_vip_data'
+  - Admin: baominhdev / 123457321
+  - Users have field isVIP (true/false)
+*/
+
+// ---------- Storage helpers ----------
+const STORAGE_KEY = 'cs_vip_data';
+function loadData(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw) {
+    const base = {
+      users: [
+        { username:'baominhdev', email:'buiminh2011tv@gmail.com', pass:'123457321', isAdmin:true, isVIP:false }
+      ],
+      scammers: [],
+      agents: [],
+      logs: []
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(base));
+    return base;
+  }
+  try { return JSON.parse(raw); } catch(e){ localStorage.removeItem(STORAGE_KEY); return loadData(); }
+}
+function saveData(d){ localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
+let DATA = loadData();
+
+// ---------- UI utils ----------
+const $ = id=>document.getElementById(id);
+const q = s=>document.querySelector(s);
+const qAll = s=>document.querySelectorAll(s);
+function show(id){ $(id).classList.remove('hidden'); }
+function hide(id){ $(id).classList.add('hidden'); }
+
+// ---------- Auth flows ----------
+let currentUser = null;
+
+function renderAuth(){
+  if(!currentUser){
+    show('auth-area'); hide('user-area'); $('admin-panel').style.display = 'none';
+    $('not-logged').style.display = 'block';
+  } else {
+    hide('not-logged'); hide('register'); hide('forgot');
+    $('whoami').innerText = currentUser.username + (currentUser.isAdmin ? ' (Admin)' : '');
+    // VIP badge
+    if(currentUser.isVIP) show('badge-vip'); else hide('badge-vip');
+    show('user-area');
+    if(currentUser.isAdmin){
+      document.getElementById('admin-panel').style.display = 'block';
+      $('admin-name').innerText = currentUser.username;
+      switchTab('scammers');
+    } else {
+      document.getElementById('admin-panel').style.display = 'none';
+    }
+    renderHistory();
+    renderVipArea();
+  }
+}
+renderAuth();
+
+// login
+$('btn-login').addEventListener('click', ()=>{
+  const u = $('login-username').value.trim();
+  const p = $('login-password').value;
+  if(!u || !p) return alert('Nhập username/email và mật khẩu');
+  const d = loadData();
+  const found = d.users.find(x=>x.username===u || x.email===u);
+  if(!found || found.pass !== p) return alert('Đăng nhập thất bại');
+  currentUser = found;
+  saveCurrentSession();
+  renderAuth();
+});
+
+// register
+$('show-register').addEventListener('click', ()=>{ hide('not-logged'); show('register'); });
+$('cancel-register').addEventListener('click', ()=>{ show('not-logged'); hide('register'); });
+$('btn-register').addEventListener('click', ()=>{
+  const u = $('reg-username').value.trim();
+  const e = $('reg-email').value.trim();
+  const p = $('reg-password').value;
+  if(!u||!e||!p) return alert('Điền đủ thông tin');
+  const d = loadData();
+  if(d.users.some(x=>x.username===u||x.email===e)) return alert('Tên hoặc email đã tồn tại');
+  d.users.push({username:u, email:e, pass:p, isAdmin:false, isVIP:false});
+  saveData(d); DATA = d;
+  alert('Tạo tài khoản thành công. Bạn có thể đăng nhập ngay.');
+  $('reg-username').value=''; $('reg-email').value=''; $('reg-password').value='';
+  show('not-logged'); hide('register');
+});
+
+// logout
+$('btn-logout').addEventListener('click', ()=>{
+  currentUser = null; localStorage.removeItem('cs_session'); renderAuth();
+});
+
+function saveCurrentSession(){
+  localStorage.setItem('cs_session', JSON.stringify({username: currentUser.username}));
+}
+
+// load session if exists
+(function tryRestore(){
+  const s = localStorage.getItem('cs_session');
+  if(s){
+    const obj = JSON.parse(s);
+    const d = loadData();
+    const u = d.users.find(x=>x.username===obj.username);
+    if(u){ currentUser = u; DATA = d; }
+  }
+  renderAuth();
+})();
+
+// forgot password (demo)
+let lastFPCode = null, lastFPE = null;
+$('btn-forgot').addEventListener('click', ()=>{ hide('not-logged'); show('forgot'); });
+$('cancel-forgot').addEventListener('click', ()=>{ show('not-logged'); hide('forgot'); });
+
+$('btn-send-code').addEventListener('click', ()=>{
+  const email = $('fp-email').value.trim();
+  if(!email) return alert('Nhập email');
+  const d = loadData();
+  const u = d.users.find(x=>x.email===email);
+  if(!u) return alert('Không tìm thấy email');
+  const code = Math.floor(100000 + Math.random()*900000).toString();
+  lastFPCode = code; lastFPE = email;
+  alert('Mã demo (hiển thị thay vì gửi email): ' + code);
+  show('fp-code-area');
+});
+
+$('btn-reset-pass').addEventListener('click', ()=>{
+  const code = $('fp-code').value.trim();
+  const newp = $('fp-newpass').value;
+  if(!code||!newp) return alert('Nhập mã và mật khẩu mới');
+  if(code !== lastFPCode) return alert('Mã không đúng');
+  const d = loadData();
+  const usr = d.users.find(x=>x.email===lastFPE);
+  if(!usr) return alert('Lỗi: user không tìm thấy');
+  usr.pass = newp;
+  saveData(d); DATA = d;
+  alert('Đổi mật khẩu thành công.');
+  $('fp-email').value=''; $('fp-code').value=''; $('fp-newpass').value='';
+  lastFPCode = null; lastFPE = null;
+  hide('forgot'); show('not-logged');
+});
+
+// ---------- Check logic ----------
+function normalizeLink(l){
+  if(!l) return '';
+  return l.trim().replace(/\/+$/,'').toLowerCase();
+}
+function checkLinkAgainstScammers(link){
+  const norm = normalizeLink(link);
+  const d = loadData();
+  const exact = d.scammers.find(s=>normalizeLink(s.fblink) === norm);
+  if(exact) return {found:true, reason:'exact', entry:exact};
+  try {
+    const u = (new URL(norm)).pathname || '';
+    const segment = u.replace(/^\/+/,'');
+    const partial = d.scammers.find(s=> (s.fblink && normalizeLink(s.fblink).includes(segment)) || (s.name && s.name.toLowerCase().includes(segment)));
+    if(partial) return {found:true, reason:'partial', entry:partial};
+  } catch(e){}
+  const byName = d.scammers.find(s=> s.name && norm.includes(s.name.toLowerCase()));
+  if(byName) return {found:true, reason:'name', entry:byName};
+  return {found:false};
+}
+
+// user check action
+$('btn-check').addEventListener('click', ()=>{
+  if(!currentUser) return alert('Bạn phải đăng nhập mới có thể check');
+  const link = $('fb-link').value.trim();
+  if(!link) return alert('Nhập link FB để kiểm tra');
+  const res = checkLinkAgainstScammers(link);
+  const timestamp = new Date().toLocaleString();
+  const d = loadData();
+  d.logs.unshift({time:timestamp, user: currentUser.username, link:link, result: res.found? ('Scam: '+ (res.entry.name || res.entry.fblink)) : 'Có vẻ an toàn'});
+  saveData(d); DATA = d;
+  renderHistory();
+  renderCheckResult(res, link);
+});
+
+// render result
+function renderCheckResult(res, link){
+  const area = $('check-result'); area.innerHTML = '';
+  const card = document.createElement('div'); card.className='item';
+  const left = document.createElement('div');
+  left.innerHTML = `<div><strong>Link:</strong> <span class="muted">${link}</span></div>`;
+  if(res.found){
+    const e = res.entry;
+    left.innerHTML += `<div style="margin-top:8px"><strong class="danger-tx">CẢNH BÁO: Có liên quan đến scam</strong></div>
+                      <div class="muted">Tên: ${e.name || '-'} | STK: ${e.bank || '-'} </div>
+                      <div class="muted">Link: ${e.fblink || '-'}</div>`;
+    const right = document.createElement('div');
+    right.innerHTML = `<div class="badge danger">SCAM</div>`;
+    card.appendChild(left); card.appendChild(right);
+  } else {
+    left.innerHTML += `<div style="margin-top:8px"><strong class="ok-tx">Có vẻ an toàn</strong></div>`;
+    const right = document.createElement('div');
+    right.innerHTML = `<div class="badge ok">OK</div>`;
+    card.appendChild(left); card.appendChild(right);
+  }
+  area.appendChild(card);
+
+  // VIP detail: nếu currentUser.isVIP show extra
+  renderVipArea();
+}
+
+// render history
+function renderHistory(){
+  const area = $('history-area'); area.innerHTML = '';
+  const d = loadData();
+  (d.logs || []).slice(0,30).forEach(l=>{
+    const it = document.createElement('div'); it.className='item';
+    it.innerHTML = `<div><div style="font-size:13px"><strong>${l.user}</strong> - <span class="muted">${l.time}</span></div>
+                    <div class="muted">Link: ${l.link}</div></div>
+                    <div>${l.result && l.result.startsWith('Scam') ? '<div class="badge danger">SCAM</div>' : '<div class="badge ok">OK</div>'}</div>`;
+    area.appendChild(it);
+  });
+}
+
+// VIP area render
+function renderVipArea(){
+  const vipArea = $('vip-section');
+  if(!currentUser || !currentUser.isVIP){ hide('vip-section'); return; }
+  show('vip-section');
+  // demo: show last scam entries with notes
+  const d = loadData();
+  const note = d.scammers.slice(0,10).map(s=>`- ${s.name||'(no name)'} | STK:${s.bank||'-'} | Link:${s.fblink||'-'}`).join('\n') || 'Chưa có dữ liệu scam';
+  $('vip-details').innerText = 'Danh sách scam (chi tiết dành cho VIP):\n' + note;
+}
+
+// ---------- Admin flows ----------
+function switchTab(name){
+  qAll('.tab').forEach(t=>t.classList.add('hidden'));
+  hide('tab-scammers'); hide('tab-agents'); hide('tab-users'); hide('tab-logs');
+  if(name==='scammers') show('tab-scammers');
+  if(name==='agents') show('tab-agents');
+  if(name==='users') show('tab-users');
+  if(name==='logs') show('tab-logs');
+  qAll('nav button').forEach(b=>b.style.borderColor='rgba(255,255,255,0.03)');
+  const btn = document.querySelector('nav button[data-tab="'+name+'"]');
+  if(btn) btn.style.borderColor='var(--accent)';
+  renderAdminLists();
+}
+qAll('nav button').forEach(b=>b.addEventListener('click', ()=> switchTab(b.dataset.tab)));
+
+function renderAdminLists(){
+  const d = loadData();
+  // scammers
+  const scList = $('scammer-list'); scList.innerHTML='';
+  (d.scammers||[]).forEach((s, idx)=>{
+    const el = document.createElement('div'); el.className='item';
+    el.innerHTML = `<div><div><strong>${s.name||'(no name)'}</strong></div>
+      <div class="muted">${s.fblink||'-'} | STK: ${s.bank||'-'}</div></div>
+      <div class="flex-stretch">
+        <button class="btn ghost" data-idx="${idx}" onclick="editScam(${idx})">Sửa</button>
+        <button class="btn" style="background:#ff5252" onclick="removeScam(${idx})">Xóa</button>
+      </div>`;
+    scList.appendChild(el);
+  });
+  // agents
+  const aList = $('agent-list'); aList.innerHTML='';
+  (d.agents||[]).forEach((a, idx)=>{
+    const el = document.createElement('div'); el.className='item';
+    el.innerHTML = `<div><div><strong>${a.name}</strong> <span class="muted">(${a.insurance||'-'})</span></div>
+      <div class="muted">Phone: ${a.phone||'-'} | STK: ${a.bank||'-'}</div></div>
+      <div><button class="btn" style="background:#00b894" onclick="removeAgent(${idx})">Xóa</button></div>`;
+    aList.appendChild(el);
+  });
+  // users
+  const ut = $('users-table').querySelector('tbody'); ut.innerHTML='';
+  (d.users||[]).forEach((u, idx)=>{
+    const vipTag = u.isVIP ? '<span class="badge vip">VIP</span>' : '';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${u.username}</td><td>${u.email||'-'}</td><td style="width:80px">${vipTag}</td>
+      <td>
+        <button class="btn ghost" onclick="toggleVip(${idx})">${u.isVIP ? 'Bỏ VIP' : 'Gán VIP'}</button>
+        <button class="btn" style="background:#ff5252" onclick="deleteUser(${idx})">Xóa</button>
+      </td>`;
+    ut.appendChild(tr);
+  });
+  // logs table
+  const lt = $('logs-table').querySelector('tbody'); lt.innerHTML='';
+  (d.logs||[]).slice(0,100).forEach(l=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${l.time}</td><td>${l.user}</td><td style="max-width:300px;word-break:break-all">${l.link}</td><td>${l.result}</td>`;
+    lt.appendChild(tr);
+  });
+}
+window.renderAdminLists = renderAdminLists;
+
+// add scam
+$('btn-add-scam').addEventListener('click', ()=>{
+  if(!currentUser || !currentUser.isAdmin) return alert('Chỉ admin được phép');
+  const n = $('s-name').value.trim(); const f = $('s-fblink').value.trim(); const b = $('s-bank').value.trim();
+  if(!n || !f) return alert('Nhập ít nhất tên và link');
+  const d = loadData();
+  d.scammers.unshift({name:n, fblink:f, bank:b, note:''});
+  saveData(d); DATA = d;
+  $('s-name').value=''; $('s-fblink').value=''; $('s-bank').value='';
+  renderAdminLists();
+});
+
+// remove scam
+window.removeScam = function(i){
+  if(!currentUser || !currentUser.isAdmin) return alert('Chỉ admin');
+  const d = loadData(); d.scammers.splice(i,1); saveData(d); DATA = d; renderAdminLists();
+}
+window.editScam = function(i){
+  if(!currentUser || !currentUser.isAdmin) return alert('Chỉ admin');
+  const d = loadData();
+  const s = d.scammers[i];
+  const nn = prompt('Tên', s.name); if(nn===null) return;
+  const ff = prompt('Link FB', s.fblink); if(ff===null) return;
+  const bb = prompt('STK / thông tin', s.bank); if(bb===null) return;
+  s.name = nn; s.fblink = ff; s.bank = bb;
+  saveData(d); DATA = d; renderAdminLists();
+}
+
+// agents
+$('btn-add-agent').addEventListener('click', ()=>{
+  if(!currentUser || !currentUser.isAdmin) return alert('Chỉ admin được phép');
+  const name = $('a-name').value.trim(); const ins = $('a-ins').value.trim();
+  const phone = $('a-phone').value.trim(); const bank = $('a-bank').value.trim(); const fb = $('a-fb').value.trim();
+  if(!name) return alert('Nhập tên agent');
+  const d = loadData(); d.agents.unshift({name, insurance:ins, phone, bank, fblink:fb});
+  saveData(d); DATA = d;
+  $('a-name').value=''; $('a-ins').value=''; $('a-phone').value=''; $('a-bank').value=''; $('a-fb').value='';
+  renderAdminLists();
+});
+window.removeAgent = function(i){
+  if(!currentUser || !currentUser.isAdmin) return alert('Chỉ admin');
+  const d = loadData(); d.agents.splice(i,1); saveData(d); DATA = d; renderAdminLists();
+}
+
+// users delete
+window.deleteUser = function(i){
+  if(!currentUser || !currentUser.isAdmin) return alert('Chỉ admin');
+  const d = loadData(); const uname = d.users[i].username;
+  if(confirm('Xóa user '+uname+' ?')){ d.users.splice(i,1); saveData(d); DATA = d; renderAdminLists(); }
+}
+
+// toggle VIP
+window.toggleVip = function(i){
+  if(!currentUser || !currentUser.isAdmin) return alert('Chỉ admin');
+  const d = loadData();
+  d.users[i].isVIP = !d.users[i].isVIP;
+  saveData(d); DATA = d; renderAdminLists();
+  alert('Đã ' + (d.users[i].isVIP ? 'gán' : 'bỏ') + ' VIP cho ' + d.users[i].username);
+}
+
+// initial render admin lists
+renderAdminLists();
+
+// Ensure admin-panel hidden initially
+document.getElementById('admin-panel').style.display = currentUser && currentUser.isAdmin ? 'block' : 'none';
+
+</script>
+</body>
+</html>
